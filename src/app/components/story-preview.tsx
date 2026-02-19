@@ -163,13 +163,19 @@ export function StoryPreview({ media, onClose }: StoryPreviewProps) {
                       </span>
                     </div>
                     <span style={{ fontSize: '14px', fontWeight: 'var(--font-weight-medium)' }}>
-                      {item.aiAnalysis?.contentType[0] || 'Content'}
+                      {item.status === 'approved'
+                        ? (() => {
+                            const name = item.treatmentName || item.aiAnalysis?.contentType?.[0];
+                            if (!name) return 'Content';
+                            return item.treatmentId ? `#${item.treatmentId} – ${name}` : name;
+                          })()
+                        : 'Pending validation'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-chart-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-chart-2"></div>
                     <span style={{ fontSize: '12px', fontWeight: 'var(--font-weight-medium)' }}>
-                      Approved
+                      {item.status === 'approved' ? 'Approved' : 'Not approved'}
                     </span>
                   </div>
                 </div>
@@ -244,6 +250,18 @@ export function StoryPreview({ media, onClose }: StoryPreviewProps) {
                     <MapPin size={12} />
                     <span>London, UK</span>
                   </div>
+                {currentMedia.status === 'approved' && (currentMedia.treatmentName || currentMedia.aiAnalysis?.contentType?.[0]) && (
+                  <div className="mt-1 inline-flex items-center rounded-full bg-white/90 px-3 py-1">
+                    <Sparkles size={12} className="mr-1.5 text-primary" />
+                    <span className="text-black" style={{ fontSize: '11px', fontWeight: 'var(--font-weight-medium)' }}>
+                      {(() => {
+                        const name = currentMedia.treatmentName || currentMedia.aiAnalysis?.contentType?.[0];
+                        if (!name) return '';
+                        return currentMedia.treatmentId ? `#${currentMedia.treatmentId} – ${name}` : name;
+                      })()}
+                    </span>
+                  </div>
+                )}
                 </div>
               </div>
             </div>
