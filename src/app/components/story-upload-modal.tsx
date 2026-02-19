@@ -1003,7 +1003,14 @@ export function StoryUploadModal({ open, onOpenChange }: { open: boolean; onOpen
               {/* Right: AI Analysis */}
               <div>
                 {uploadedMedia.map(media => (
-                  <AIAnalysisPanel key={media.id} media={media} />
+                  <AIAnalysisPanel
+                    key={media.id}
+                    media={media}
+                    onRetryUpload={() => {
+                      removeMedia(media.id);
+                      fileInputRef.current?.click();
+                    }}
+                  />
                 ))}
               </div>
             </div>
@@ -1051,7 +1058,7 @@ function CompactMediaPreview({ media, onRemove }: CompactMediaPreviewProps) {
 
         <button
           onClick={onRemove}
-          className="absolute top-3 right-3 bg-destructive text-destructive-foreground rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-3 right-3 bg-destructive text-destructive-foreground rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity z-20"
         >
           <X size={18} />
         </button>
@@ -1064,7 +1071,7 @@ function CompactMediaPreview({ media, onRemove }: CompactMediaPreviewProps) {
         )}
 
         {media.status === 'rejected' && (
-          <div className="absolute inset-0 bg-destructive/90 flex flex-col items-center justify-center text-destructive-foreground p-6 text-center">
+          <div className="absolute inset-0 bg-destructive/90 flex flex-col items-center justify-center text-destructive-foreground p-6 text-center z-10">
             <AlertCircle size={48} className="mb-3" />
             <span style={{ fontSize: '16px', fontWeight: 'var(--font-weight-medium)' }}>Content Rejected</span>
           </div>
@@ -1078,6 +1085,7 @@ function CompactMediaPreview({ media, onRemove }: CompactMediaPreviewProps) {
 
 interface AIAnalysisPanelProps {
   media: UploadedMedia;
+  onRetryUpload: () => void;
 }
 
 const FLAG_LABELS: Record<string, string> = {
@@ -1089,7 +1097,7 @@ const FLAG_LABELS: Record<string, string> = {
   offTopicContent: 'Off-topic content',
 };
 
-function AIAnalysisPanel({ media }: AIAnalysisPanelProps) {
+function AIAnalysisPanel({ media, onRetryUpload }: AIAnalysisPanelProps) {
   if (media.status === 'analyzing') {
     return (
       <div className="bg-card border border-border rounded-[var(--radius)] p-8 min-h-[400px] flex flex-col items-center justify-center">
@@ -1182,9 +1190,14 @@ function AIAnalysisPanel({ media }: AIAnalysisPanelProps) {
         )}
 
         <div className="bg-muted/50 rounded-[var(--radius)] p-5">
-          <p className="text-foreground" style={{ fontSize: '15px', lineHeight: '1.6' }}>
-            Please remove this content and upload a different picture or video that meets our guidelines.
-          </p>
+          <div className="space-y-4">
+            <p className="text-foreground" style={{ fontSize: '15px', lineHeight: '1.6' }}>
+              Please upload a different picture or video that meets our guidelines.
+            </p>
+            <Button size="sm" variant="outline" onClick={onRetryUpload}>
+              Upload a different image
+            </Button>
+          </div>
         </div>
       </div>
     );
